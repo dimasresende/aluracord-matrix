@@ -21,8 +21,26 @@ function Title(props) {
 }
 
 export default function PaginaInicial() {
-  const [username, setUsername] = useState('dimasresende');
-  const roteamento = useRouter();
+  const USERIMAGEDEFAULT = 'https://cdn.pixabay.com/photo/2018/11/13/21/43/instagram-3814049_960_720.png';
+
+  const [username, setUsername] = useState('');
+  const [imageProfile, setImageProfile] = useState(USERIMAGEDEFAULT);
+  const route = useRouter();
+
+  const validUsername = (event)=>{
+    let valor = event.target.value;
+
+    if (valor.length > 2){
+      setImageProfile(`https://github.com/${valor}.png`);
+    }
+    else{
+      setImageProfile(USERIMAGEDEFAULT);
+    }
+    
+    setUsername(valor)
+    
+  }
+
 
   return (
     <>
@@ -54,7 +72,7 @@ export default function PaginaInicial() {
             as="form"
             onSubmit={(event) => {
               event.preventDefault();
-              roteamento.push('/chat');
+              route.push('/chat');
             }}
             styleSheet={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -68,10 +86,7 @@ export default function PaginaInicial() {
 
             <TextField
               value={username}
-              onChange={(event) => {
-                const valor = event.target.value;
-                setUsername(valor);
-              }}
+              onChange={validUsername}
               fullWidth
               textFieldColors={{
                 neutral: {
@@ -85,6 +100,7 @@ export default function PaginaInicial() {
             <Button
               type='submit'
               label='Entrar'
+              disabled={username.length < 3}
               fullWidth
               buttonColors={{
                 contrastColor: appConfig.theme.colors.neutrals["000"],
@@ -118,7 +134,7 @@ export default function PaginaInicial() {
                 borderRadius: '50%',
                 marginBottom: '16px',
               }}
-              src={`https://github.com/${username}.png`}
+              src={imageProfile}
             />
             <Text
               variant="body4"
