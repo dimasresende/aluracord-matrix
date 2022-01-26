@@ -71,7 +71,7 @@ export default function ChatPage() {
                         padding: '16px',
                     }}
                 >
-                    <MessageList mensagens={listaDeMensagens} />
+                    <MessageList mensagens={listaDeMensagens}  setListDeMensagem={setListaDeMensagens} />
                     {/* {listaDeMensagens.map((mensagemAtual) => {
                         return (
                             <li key={mensagemAtual.id}>
@@ -151,7 +151,12 @@ function Header() {
 }
 
 function MessageList(props) {
-    console.log(props);
+    function deletaMensagem(id) {
+      const mensagemRemovida = props.mensagens.filter((mensagem) => id !== mensagem.id)
+      //console.log(mensagemRemovida) ta saindo o novo array com valores excluidos
+      props.setListDeMensagem(mensagemRemovida)
+    }  
+  
     return (
         <Box
             tag="ul"
@@ -181,8 +186,16 @@ function MessageList(props) {
                         <Box
                             styleSheet={{
                                 marginBottom: '8px',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'flex-start',
                             }}
                         >
+                          <Box 
+                            styleSheet={{
+                              display: 'flex',
+                            }}
+                          >
                             <Image
                                 styleSheet={{
                                     width: '20px',
@@ -206,6 +219,21 @@ function MessageList(props) {
                             >
                                 {(new Date().toLocaleDateString())}
                             </Text>
+                            </Box>
+
+                            <Button
+                              onClick={(event) => {
+                                event.preventDefault();
+                                deletaMensagem(mensagem.id);
+                              }}
+                              buttonColors={{
+                                contrastColor: appConfig.theme.colors.neutrals["000"],
+                                mainColor: appConfig.theme.colors.neutrals[600],
+                                mainColorStrong: appConfig.theme.colors.primary[600],
+                              }}
+                              colorVariant="negative"
+                              iconName="FaTrash"
+                            />
                         </Box>
                         {mensagem.texto}
                     </Text>
