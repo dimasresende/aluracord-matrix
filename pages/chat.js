@@ -18,17 +18,20 @@ export default function ChatPage() {
     - [X] Lista de mensagens 
     */
     function handleNovaMensagem(novaMensagem) {
-        const mensagem = {
-            id: listaDeMensagens.length + 1,
-            de: 'vanessametonini',
-            texto: novaMensagem,
-        };
+      
+      if(novaMensagem !== '') {
+          const mensagem = {
+              id: listaDeMensagens.length + 1,
+              de: 'vanessametonini',
+              texto: novaMensagem,
+          };
 
-        setListaDeMensagens([
-            mensagem,
-            ...listaDeMensagens,
-        ]);
-        setMensagem('');
+          setListaDeMensagens([
+              mensagem,
+              ...listaDeMensagens,
+          ]);
+          setMensagem('');
+        }
     }
 
     return (
@@ -98,7 +101,7 @@ export default function ChatPage() {
                             placeholder="Insira sua mensagem aqui..."
                             type="textarea"
                             styleSheet={{
-                                width: '100%',
+                                width: '95%',
                                 border: '0',
                                 resize: 'none',
                                 borderRadius: '5px',
@@ -108,6 +111,20 @@ export default function ChatPage() {
                                 color: appConfig.theme.colors.neutrals[200],
                             }}
                         />
+                        <Button
+                          type='button'
+                          label='Enviar'
+                          onClick={() => {
+                            handleNovaMensagem(mensagem);
+                          }}
+                          buttonColors={{
+                            contrastColor: appConfig.theme.colors.neutrals["000"],
+                            mainColor: appConfig.theme.colors.primary[500],
+                            mainColorLight: appConfig.theme.colors.primary[400],
+                            mainColorStrong: appConfig.theme.colors.primary[600],
+                          }}
+                        />
+
                     </Box>
                 </Box>
             </Box>
