@@ -1,14 +1,26 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
-import React from 'react';
+import React, { useEffect } from 'react';
 import appConfig from '../config.json';
+import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzMyMjY4OCwiZXhwIjoxOTU4ODk4Njg4fQ.2lQTqL_fiOj2dqVyEykr-6f0-rM8uOeF9qM7-4moxB4';
 const SUPABASE_URL = 'https://pwvxbmrbhlqprporrjfr.supabase.co';
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export default function ChatPage() {
     const [mensagem, setMensagem] = React.useState('');
     const [listaDeMensagens, setListaDeMensagens] = React.useState([]);
 
+    useEffect(() => {
+        supabaseClient
+            .from('mensagens')
+            .select('*')
+            .order('id', {ascending: false})
+            .then(({ data })=> {
+                setListaDeMensagens(data)
+            })
+    
+    }, [])
     /*
     // Usuário
     - Usuário digita no campo textarea
@@ -21,19 +33,24 @@ export default function ChatPage() {
     - [X] Lista de mensagens 
     */
     function handleNovaMensagem(novaMensagem) {
-      
-      if(novaMensagem !== '') {
-          const mensagem = {
-              id: listaDeMensagens.length + 1,
-              de: 'vanessametonini',
-              texto: novaMensagem,
-          };
 
-          setListaDeMensagens([
-              mensagem,
-              ...listaDeMensagens,
-          ]);
-          setMensagem('');
+        if(novaMensagem !== '') {
+            const mensagem = {
+                de: 'vanessametonini',
+                texto: novaMensagem,
+            };
+
+            supabaseClient
+                .from('mensagens')
+                .insert([mensagem])
+                .then(({ data }) => {
+                    setListaDeMensagens([
+                        data[0],
+                        ...listaDeMensagens,
+                    ]);
+                });
+
+            setMensagem('');
         }
     }
 
@@ -115,17 +132,17 @@ export default function ChatPage() {
                             }}
                         />
                         <Button
-                          type='button'
-                          label='Enviar'
-                          onClick={() => {
-                            handleNovaMensagem(mensagem);
-                          }}
-                          buttonColors={{
-                            contrastColor: appConfig.theme.colors.neutrals["000"],
-                            mainColor: appConfig.theme.colors.primary[500],
-                            mainColorLight: appConfig.theme.colors.primary[400],
-                            mainColorStrong: appConfig.theme.colors.primary[600],
-                          }}
+                            type='button'
+                            label='Enviar'
+                            onClick={() => {
+                                handleNovaMensagem(mensagem);
+                            }}
+                            buttonColors={{
+                                contrastColor: appConfig.theme.colors.neutrals["000"],
+                                mainColor: appConfig.theme.colors.primary[500],
+                                mainColorLight: appConfig.theme.colors.primary[400],
+                                mainColorStrong: appConfig.theme.colors.primary[600],
+                            }}
                         />
 
                     </Box>
@@ -155,11 +172,11 @@ function Header() {
 
 function MessageList(props) {
     function deletaMensagem(id) {
-      const mensagemRemovida = props.mensagens.filter((mensagem) => id !== mensagem.id)
-      //console.log(mensagemRemovida) ta saindo o novo array com valores excluidos
-      props.setListDeMensagem(mensagemRemovida)
+        const mensagemRemovida = props.mensagens.filter((mensagem) => id !== mensagem.id)
+        //console.log(mensagemRemovida) ta saindo o novo array com valores excluidos
+        props.setListDeMensagem(mensagemRemovida)
     }  
-  
+
     return (
         <Box
             tag="ul"
@@ -194,11 +211,11 @@ function MessageList(props) {
                                 alignItems: 'flex-start',
                             }}
                         >
-                          <Box 
-                            styleSheet={{
-                              display: 'flex',
-                            }}
-                          >
+                            <Box 
+                                styleSheet={{
+                                    display: 'flex',
+                                }}
+                            >
                             <Image
                                 styleSheet={{
                                     width: '20px',
@@ -207,7 +224,7 @@ function MessageList(props) {
                                     display: 'inline-block',
                                     marginRight: '8px',
                                 }}
-                                src={`https://github.com/vanessametonini.png`}
+                                src={`https://github.com/${mensagem.de}.png`}
                             />
                             <Text tag="strong">
                                 {mensagem.de}
@@ -225,17 +242,17 @@ function MessageList(props) {
                             </Box>
 
                             <Button
-                              onClick={(event) => {
-                                event.preventDefault();
-                                deletaMensagem(mensagem.id);
-                              }}
-                              buttonColors={{
-                                contrastColor: appConfig.theme.colors.neutrals["000"],
-                                mainColor: appConfig.theme.colors.neutrals[600],
-                                mainColorStrong: appConfig.theme.colors.primary[600],
-                              }}
-                              colorVariant="negative"
-                              iconName="FaTrash"
+                                onClick={(event) => {
+                                    event.preventDefault();
+                                    deletaMensagem(mensagem.id);
+                                }}
+                                buttonColors={{
+                                    contrastColor: appConfig.theme.colors.neutrals["000"],
+                                    mainColor: appConfig.theme.colors.neutrals[600],
+                                    mainColorStrong: appConfig.theme.colors.primary[600],
+                                }}
+                                colorVariant="negative"
+                                iconName="FaTrash"
                             />
                         </Box>
                         {mensagem.texto}
