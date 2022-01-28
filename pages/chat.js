@@ -2,12 +2,16 @@ import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import React, { useEffect } from 'react';
 import appConfig from '../config.json';
 import { createClient } from '@supabase/supabase-js';
+import { useRouter } from 'next/router';
+import { ButtonSendSticker } from '../src/components/ButtonSendSticker';
 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzMyMjY4OCwiZXhwIjoxOTU4ODk4Njg4fQ.2lQTqL_fiOj2dqVyEykr-6f0-rM8uOeF9qM7-4moxB4';
 const SUPABASE_URL = 'https://pwvxbmrbhlqprporrjfr.supabase.co';
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export default function ChatPage() {
+    const roteamento = useRouter();
+    const usuarioLogado = roteamento.query.username;
     const [mensagem, setMensagem] = React.useState('');
     const [listaDeMensagens, setListaDeMensagens] = React.useState([]);
 
@@ -36,7 +40,7 @@ export default function ChatPage() {
 
         if(novaMensagem !== '') {
             const mensagem = {
-                de: 'vanessametonini',
+                de: usuarioLogado,
                 texto: novaMensagem,
             };
 
@@ -129,6 +133,11 @@ export default function ChatPage() {
                                 backgroundColor: appConfig.theme.colors.neutrals[800],
                                 marginRight: '12px',
                                 color: appConfig.theme.colors.neutrals[200],
+                            }}
+                        />
+                        <ButtonSendSticker
+                            onStickerClick={(sticker) => {
+                                handleNovaMensagem(':sticker:' + sticker);
                             }}
                         />
                         <Button
@@ -255,7 +264,11 @@ function MessageList(props) {
                                 iconName="FaTrash"
                             />
                         </Box>
-                        {mensagem.texto}
+                        {mensagem.texto.startsWith(':sticker:') ? (
+                            <Image src={mensagem.texto.replace(':sticker:', '')} />
+                        ) : (
+                            mensagem.texto
+                        )}
                     </Text>
                 );
             })}
